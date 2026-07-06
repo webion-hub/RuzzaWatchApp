@@ -1,9 +1,9 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { GlassSurface } from '@/components/glass';
 import { Font, Palette } from '@/constants/design';
 import { useAuth } from '@/context/auth-context';
 
@@ -68,12 +68,7 @@ export function ScreenHeader({ title }: { title: string }) {
         style={styles.chip}
         onPress={() => router.push('/account')}
         accessibilityLabel="Account">
-        <LinearGradient
-          colors={['#4b88ff', '#e95935']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
+        <GlassSurface shape="circle" />
         {initials ? (
           <Text style={styles.initials}>{initials}</Text>
         ) : (

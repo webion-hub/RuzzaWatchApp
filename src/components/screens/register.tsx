@@ -34,11 +34,11 @@ export default function RegisterScreen() {
       return;
     }
     const { ok, errors } = await signUp({ firstName, lastName, email, password });
-    if (ok) {
-      router.back();
-    } else {
+    if (!ok) {
       setError(errors.map((e) => e.message).join('\n') || 'Registrazione non riuscita.');
+      return;
     }
+    router.back();
   };
 
   return (

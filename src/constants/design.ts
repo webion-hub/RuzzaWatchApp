@@ -25,7 +25,6 @@ export const Font = {
   sansSemibold: 'GeneralSans-Semibold',
   serif: 'LibreBaskerville_400Regular',
   serifItalic: 'LibreBaskerville_400Regular_Italic',
-  serifBold: 'LibreBaskerville_700Bold',
 } as const;
 
 /**

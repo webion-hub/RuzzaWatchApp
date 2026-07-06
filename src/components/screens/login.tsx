@@ -32,11 +32,11 @@ export default function LoginScreen() {
       return;
     }
     const { ok, errors } = await signIn(email, password);
-    if (ok) {
-      router.back();
-    } else {
+    if (!ok) {
       setError(errors.map((e) => e.message).join('\n') || 'Accesso non riuscito.');
+      return;
     }
+    router.back();
   };
 
   return (

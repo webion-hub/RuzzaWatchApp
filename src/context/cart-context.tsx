@@ -61,15 +61,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     (async () => {
       try {
         const savedId = await AsyncStorage.getItem(CART_ID_KEY);
-        if (savedId) {
-          const existing = await fetchCart(savedId);
-          if (active && existing) {
-            setCart(existing);
-          } else if (active) {
-            // Cart expired or was completed — drop the stale id.
-            await AsyncStorage.removeItem(CART_ID_KEY);
-          }
+        if (!savedId) return;
+        const existing = await fetchCart(savedId);
+        if (!active) return;
+        if (existing) {
+          setCart(existing);
+          return;
         }
+        // Cart expired or was completed — drop the stale id.
+        await AsyncStorage.removeItem(CART_ID_KEY);
       } catch (err) {
         // A missing/misconfigured Shopify setup shouldn't crash the app; the
         // product screens surface configuration errors on their own.

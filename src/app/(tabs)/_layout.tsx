@@ -1,55 +1,52 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { TabList, Tabs, TabSlot, TabTrigger } from 'expo-router/ui';
-import { Pressable, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
-import { footerStyles, TabButton } from '@/components/floating-footer';
 import { Palette } from '@/constants/design';
 import { useCart } from '@/context/cart-context';
 
 /**
- * Tab navigator with the custom floating footer. The <Tabs>/<TabList>/
- * <TabTrigger> tree must be assembled here directly — `expo-router/ui`
- * discovers screens by statically walking these children. The search circle is
- * a sibling of TabList (it isn't a route). Order: Carrello · Watch · Profumi.
+ * Native tab bar (`expo-router/unstable-native-tabs`) — a real UITabBar, so on
+ * iOS 26 it renders with the system **Liquid Glass** material automatically (we
+ * intentionally leave `backgroundColor` unset so the glass shows through). The
+ * `role="search"` trigger becomes the separate glass search item on iOS 26.
+ *
+ * Icons reuse the app's MaterialCommunityIcons via `VectorIcon`; labels use the
+ * General Sans family. Order: Carrello · Watch · Profumi · Search.
  */
+const { Icon, Label, Badge, VectorIcon } = NativeTabs.Trigger;
+
 export default function TabsLayout() {
-  const insets = useSafeAreaInsets();
   const { totalQuantity } = useCart();
-  const bottom = Math.max(insets.bottom, 12);
 
   return (
-    <Tabs>
-      <TabSlot />
+    <NativeTabs
+      badgeBackgroundColor={Palette.orange}
+      iconColor={{ default: Palette.whiteMuted, selected: Palette.white }}
+      labelStyle={{
+        default: { color: Palette.whiteMuted, fontFamily: 'GeneralSans-Medium' },
+        selected: { color: Palette.white, fontFamily: 'GeneralSans-Medium' },
+      }}>
+      <NativeTabs.Trigger name="carrello">
+        <Icon src={<VectorIcon family={MaterialCommunityIcons} name="basket" />} />
+        <Label>Carrello</Label>
+        {totalQuantity > 0 ? <Badge>{String(totalQuantity)}</Badge> : null}
+      </NativeTabs.Trigger>
 
-      <TabList style={[footerStyles.bar, { bottom }]}>
-        <TabTrigger name="carrello" href="/carrello" asChild>
-          <TabButton
-            icon="basket-outline"
-            iconActive="basket"
-            label="Carrello"
-            badge={totalQuantity}
-          />
-        </TabTrigger>
+      <NativeTabs.Trigger name="index">
+        <Icon src={<VectorIcon family={MaterialCommunityIcons} name="watch" />} />
+        <Label>Watch</Label>
+      </NativeTabs.Trigger>
 
-        <TabTrigger name="index" href="/" asChild>
-          <TabButton icon="watch-variant" iconActive="watch" label="Watch" />
-        </TabTrigger>
+      <NativeTabs.Trigger name="profumi">
+        <Icon src={<VectorIcon family={MaterialCommunityIcons} name="bottle-tonic" />} />
+        <Label>Profumi</Label>
+      </NativeTabs.Trigger>
 
-        <TabTrigger name="profumi" href="/profumi" asChild>
-          <TabButton
-            icon="bottle-tonic-outline"
-            iconActive="bottle-tonic"
-            label="Profumi"
-          />
-        </TabTrigger>
-      </TabList>
-
-      <View style={[footerStyles.searchWrap, { bottom }]} pointerEvents="box-none">
-        <Pressable style={footerStyles.searchButton} accessibilityLabel="Cerca">
-          <MaterialCommunityIcons name="magnify" size={24} color={Palette.white} />
-        </Pressable>
-      </View>
-    </Tabs>
+      {/* iOS 26: renders as the separate Liquid-Glass search circle */}
+      <NativeTabs.Trigger name="search" role="search">
+        <Icon src={<VectorIcon family={MaterialCommunityIcons} name="magnify" />} />
+        <Label>Cerca</Label>
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }

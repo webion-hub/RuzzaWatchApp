@@ -1,7 +1,6 @@
 import {
   LibreBaskerville_400Regular,
   LibreBaskerville_400Regular_Italic,
-  LibreBaskerville_700Bold,
 } from '@expo-google-fonts/libre-baskerville';
 import { useFonts } from 'expo-font';
 import { DarkTheme, Stack, ThemeProvider } from 'expo-router';
@@ -27,7 +26,6 @@ export default function RootLayout() {
     'GeneralSans-Semibold': require('@/assets/fonts/GeneralSans-Semibold.ttf'),
     LibreBaskerville_400Regular,
     LibreBaskerville_400Regular_Italic,
-    LibreBaskerville_700Bold,
   });
 
   const onReady = useCallback(() => {

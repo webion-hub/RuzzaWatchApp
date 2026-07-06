@@ -14,6 +14,7 @@ import {
   font,
   foregroundColor,
   frame,
+  multilineTextAlignment,
   padding,
   tint,
 } from '@expo/ui/swift-ui/modifiers';
@@ -120,17 +121,31 @@ function Gate({
   onRegister: () => void;
 }) {
   return (
-    <VStack alignment="leading" spacing={16} modifiers={[padding({ horizontal: 24, top: 40 })]}>
-      <Text modifiers={[font({ family: 'GeneralSans-Medium', size: 32 }), foregroundColor(Palette.white)]}>
+    <VStack alignment="center" spacing={16} modifiers={[padding({ leading: 24, trailing: 24, top: 40 })]}>
+      <Text
+        modifiers={[
+          font({ family: 'GeneralSans-Medium', size: 32 }),
+          foregroundColor(Palette.white),
+          multilineTextAlignment('center'),
+          frame({ maxWidth: 9999, alignment: 'center' }),
+        ]}>
         Il tuo account
       </Text>
-      <Text modifiers={[foregroundColor(Palette.whiteMuted), font({ size: 16 })]}>
+      <Text
+        modifiers={[
+          foregroundColor(Palette.whiteMuted),
+          font({ size: 16 }),
+          multilineTextAlignment('center'),
+          frame({ maxWidth: 9999, alignment: 'center' }),
+        ]}>
         Crea un account Ruzza per salvare il carrello e completare gli acquisti.
       </Text>
       <Button
         onPress={onRegister}
-        modifiers={[buttonStyle('borderedProminent'), controlSize('large'), tint(Palette.blue), frame({ maxWidth: 9999 })]}>
-        <Text>Crea account</Text>
+        modifiers={[buttonStyle('borderedProminent'), controlSize('large'), tint('#ffffff'), frame({ maxWidth: 9999 })]}>
+        <Text modifiers={[foregroundColor('#000000'), font({ family: 'GeneralSans-Semibold', size: 15 })]}>
+          Crea account
+        </Text>
       </Button>
       <Button onPress={onLogin} modifiers={[frame({ maxWidth: 9999 })]}>
         <Text modifiers={[foregroundColor(Palette.white)]}>Ho già un account</Text>

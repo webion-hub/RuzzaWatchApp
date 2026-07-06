@@ -9,6 +9,7 @@ import {
   foregroundColor,
   frame,
   keyboardType,
+  multilineTextAlignment,
   padding,
   textFieldStyle,
   textInputAutocapitalization,
@@ -44,24 +45,26 @@ export default function RegisterScreen() {
       return;
     }
     const { ok, errors } = await signUp({ firstName, lastName, email, password });
-    if (ok) {
-      router.back();
-    } else {
+    if (!ok) {
       setError(
         errors.map((e) => e.message).join('\n') || 'Registrazione non riuscita.',
       );
+      return;
     }
+    router.back();
   };
 
   return (
     <View style={styles.container}>
       <StackHeader title="Crea account" />
       <Host style={styles.host}>
-        <VStack alignment="leading" spacing={16} modifiers={[padding({ all: 24 })]}>
+        <VStack alignment="center" spacing={16} modifiers={[padding({ all: 24 })]}>
           <Text
             modifiers={[
               font({ family: 'GeneralSans-Semibold', size: 28 }),
               foregroundColor(Palette.white),
+              multilineTextAlignment('center'),
+              frame({ maxWidth: 9999, alignment: 'center' }),
             ]}>
             Crea account
           </Text>
@@ -72,6 +75,7 @@ export default function RegisterScreen() {
             modifiers={[
               textFieldStyle('roundedBorder'),
               textInputAutocapitalization('words'),
+              frame({ maxWidth: 9999 }),
             ]}
           />
           <TextField
@@ -80,6 +84,7 @@ export default function RegisterScreen() {
             modifiers={[
               textFieldStyle('roundedBorder'),
               textInputAutocapitalization('words'),
+              frame({ maxWidth: 9999 }),
             ]}
           />
           <TextField
@@ -90,12 +95,13 @@ export default function RegisterScreen() {
               keyboardType('email-address'),
               textInputAutocapitalization('never'),
               autocorrectionDisabled(true),
+              frame({ maxWidth: 9999 }),
             ]}
           />
           <SecureField
             placeholder="Password (min 5 caratteri)"
             onTextChange={setPassword}
-            modifiers={[textFieldStyle('roundedBorder')]}
+            modifiers={[textFieldStyle('roundedBorder'), frame({ maxWidth: 9999 })]}
           />
 
           {error ? (
@@ -103,6 +109,8 @@ export default function RegisterScreen() {
               modifiers={[
                 foregroundColor(Palette.orange),
                 font({ size: 14, weight: 'medium' }),
+                multilineTextAlignment('center'),
+                frame({ maxWidth: 9999, alignment: 'center' }),
               ]}>
               {error}
             </Text>
@@ -113,11 +121,13 @@ export default function RegisterScreen() {
             modifiers={[
               buttonStyle('borderedProminent'),
               controlSize('large'),
-              tint(Palette.blue),
+              tint('#ffffff'),
               frame({ maxWidth: 9999 }),
               ...(busy ? [disabledModifier(true)] : []),
             ]}>
-            <Text>{busy ? 'Attendere…' : 'Crea account'}</Text>
+            <Text modifiers={[foregroundColor('#000000'), font({ family: 'GeneralSans-Semibold', size: 15 })]}>
+              {busy ? 'Attendere…' : 'Crea account'}
+            </Text>
           </Button>
 
           <Button role="cancel" onPress={() => router.replace('/account/login')}>

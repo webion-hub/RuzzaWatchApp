@@ -82,15 +82,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           TOKEN_KEY,
           EXPIRES_KEY,
         ]);
-        if (saved && (!expires || new Date(expires).getTime() > Date.now())) {
-          const me = await getCustomer(saved);
-          if (active && me) {
-            setToken(saved);
-            setCustomer(me);
-          } else if (active) {
-            await AsyncStorage.multiRemove([TOKEN_KEY, EXPIRES_KEY]);
-          }
+        if (!saved) return;
+        const expired = !!expires && new Date(expires).getTime() <= Date.now();
+        if (expired) return;
+        const me = await getCustomer(saved);
+        if (!active) return;
+        if (me) {
+          setToken(saved);
+          setCustomer(me);
+          return;
         }
+        // Token invalid/expired server-side — drop the stale credentials.
+        await AsyncStorage.multiRemove([TOKEN_KEY, EXPIRES_KEY]);
       } catch {
         // ignore — user simply starts logged out
       } finally {

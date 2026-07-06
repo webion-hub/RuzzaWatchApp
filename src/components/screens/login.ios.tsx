@@ -9,6 +9,7 @@ import {
   foregroundColor,
   frame,
   keyboardType,
+  multilineTextAlignment,
   padding,
   textFieldStyle,
   textInputAutocapitalization,
@@ -38,22 +39,24 @@ export default function LoginScreen() {
       return;
     }
     const { ok, errors } = await signIn(email, password);
-    if (ok) {
-      router.back();
-    } else {
+    if (!ok) {
       setError(errors.map((e) => e.message).join('\n') || 'Accesso non riuscito.');
+      return;
     }
+    router.back();
   };
 
   return (
     <View style={styles.container}>
       <StackHeader title="Accedi" />
       <Host style={styles.host}>
-        <VStack alignment="leading" spacing={16} modifiers={[padding({ all: 24 })]}>
+        <VStack alignment="center" spacing={16} modifiers={[padding({ all: 24 })]}>
           <Text
             modifiers={[
               font({ family: 'GeneralSans-Semibold', size: 28 }),
               foregroundColor(Palette.white),
+              multilineTextAlignment('center'),
+              frame({ maxWidth: 9999, alignment: 'center' }),
             ]}>
             Bentornato
           </Text>
@@ -66,12 +69,13 @@ export default function LoginScreen() {
               keyboardType('email-address'),
               textInputAutocapitalization('never'),
               autocorrectionDisabled(true),
+              frame({ maxWidth: 9999 }),
             ]}
           />
           <SecureField
             placeholder="Password"
             onTextChange={setPassword}
-            modifiers={[textFieldStyle('roundedBorder')]}
+            modifiers={[textFieldStyle('roundedBorder'), frame({ maxWidth: 9999 })]}
           />
 
           {error ? (
@@ -79,6 +83,8 @@ export default function LoginScreen() {
               modifiers={[
                 foregroundColor(Palette.orange),
                 font({ size: 14, weight: 'medium' }),
+                multilineTextAlignment('center'),
+                frame({ maxWidth: 9999, alignment: 'center' }),
               ]}>
               {error}
             </Text>
@@ -89,11 +95,13 @@ export default function LoginScreen() {
             modifiers={[
               buttonStyle('borderedProminent'),
               controlSize('large'),
-              tint(Palette.blue),
+              tint('#ffffff'),
               frame({ maxWidth: 9999 }),
               ...(busy ? [disabledModifier(true)] : []),
             ]}>
-            <Text>{busy ? 'Attendere…' : 'Accedi'}</Text>
+            <Text modifiers={[foregroundColor('#000000'), font({ family: 'GeneralSans-Semibold', size: 15 })]}>
+              {busy ? 'Attendere…' : 'Accedi'}
+            </Text>
           </Button>
 
           <Button role="cancel" onPress={() => router.replace('/account/register')}>
