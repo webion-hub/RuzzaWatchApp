@@ -9,17 +9,24 @@ import {
   Text,
   VStack,
 } from '@expo/ui/swift-ui';
-import { buttonStyle, font, foregroundColor, frame, padding } from '@expo/ui/swift-ui/modifiers';
+import {
+  buttonStyle,
+  font,
+  foregroundColor,
+  frame,
+  glassEffect,
+  padding,
+} from '@expo/ui/swift-ui/modifiers';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FLOATING_FOOTER_HEIGHT } from '@/components/floating-footer';
-import { ScreenHeader } from '@/components/screen-header';
 import { GridCard } from '@/components/watch-cards';
 import { WatchCarousel } from '@/components/watch-carousel';
 import { Palette } from '@/constants/design';
+import { useAuth } from '@/context/auth-context';
 import { isShopifyConfigured } from '@/lib/config';
 import { getCollectionProducts } from '@/lib/queries';
 import type { Product } from '@/lib/types';
@@ -33,6 +40,7 @@ import type { Product } from '@/lib/types';
 export default function WatchScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { customer, isLoggedIn } = useAuth();
   const { width } = useWindowDimensions();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,16 +65,50 @@ export default function WatchScreen() {
 
   const bottomPad = insets.bottom + FLOATING_FOOTER_HEIGHT + 24;
   const empty = !loading && products.length === 0;
+  const initials =
+    isLoggedIn && customer
+      ? [customer.firstName?.[0], customer.lastName?.[0]]
+          .filter(Boolean)
+          .join('')
+          .toUpperCase()
+      : '';
 
   return (
     <View style={styles.container}>
-      <View style={{ paddingTop: insets.top }}>
-        <ScreenHeader title="Watch" />
-      </View>
-
       <Host style={styles.host}>
         <SUIScrollView>
-          <VStack alignment="leading" spacing={24} modifiers={[padding({ top: 8, bottom: bottomPad })]}>
+          <VStack alignment="leading" spacing={24} modifiers={[padding({ top: insets.top + 4, bottom: bottomPad })]}>
+            {/* Watch header — scrolls with the page (no longer fixed) */}
+            <HStack modifiers={[frame({ maxWidth: 9999 }), padding({ leading: 16, trailing: 16 })]}>
+              <Text modifiers={[font({ family: 'GeneralSans-Semibold', size: 32 }), foregroundColor(Palette.white)]}>
+                Watch
+              </Text>
+              <Spacer />
+              <Button onPress={() => router.push('/account')} modifiers={[buttonStyle('plain')]}>
+                {initials ? (
+                  <Text
+                    modifiers={[
+                      font({ family: 'GeneralSans-Semibold', size: 18 }),
+                      foregroundColor(Palette.white),
+                      frame({ width: 52, height: 52 }),
+                      glassEffect({ glass: { variant: 'regular' }, shape: 'circle' }),
+                    ]}>
+                    {initials}
+                  </Text>
+                ) : (
+                  <SUIImage
+                    systemName="person.fill"
+                    size={22}
+                    color={Palette.white}
+                    modifiers={[
+                      frame({ width: 52, height: 52 }),
+                      glassEffect({ glass: { variant: 'regular' }, shape: 'circle' }),
+                    ]}
+                  />
+                )}
+              </Button>
+            </HStack>
+
             {/* "I nuovi Ruzza Watch" */}
             <HStack spacing={6} modifiers={[frame({ maxWidth: 9999 }), padding({ leading: 16, trailing: 16 })]}>
               <Text modifiers={[font({ family: 'GeneralSans-Medium', size: 24 }), foregroundColor(Palette.white)]}>

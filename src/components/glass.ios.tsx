@@ -2,7 +2,7 @@ import { Host, HStack, Spacer } from '@expo/ui/swift-ui';
 import { frame, glassEffect } from '@expo/ui/swift-ui/modifiers';
 import { StyleSheet } from 'react-native';
 
-export type GlassShape = 'capsule' | 'circle';
+export type GlassShape = 'capsule' | 'circle' | 'rectangle';
 
 /**
  * A Liquid-Glass surface (iOS 26, real SwiftUI via `@expo/ui`). Render it as the
