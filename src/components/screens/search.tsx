@@ -1,22 +1,26 @@
+import { Stack } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FLOATING_FOOTER_HEIGHT } from '@/components/floating-footer';
-import { ScreenHeader } from '@/components/screen-header';
 import { GridCard } from '@/components/watch-cards';
 import { Font, Palette, watchColorName } from '@/constants/design';
 import { getCollectionProducts } from '@/lib/queries';
 import type { Product } from '@/lib/types';
 
-/** Search — RN implementation (Android / web): text field + live-filtered grid. */
+/**
+ * Search — uses the NATIVE iOS search bar wired into the search tab's header
+ * (`headerSearchBarOptions`, backed by `UISearchController` via react-native-
+ * screens). Typing in it filters the product grid live. The header/Stack that
+ * hosts the search bar is `src/app/(tabs)/search/_layout.tsx`.
+ */
 export default function SearchScreen() {
   const insets = useSafeAreaInsets();
   const [products, setProducts] = useState<Product[]>([]);
@@ -54,17 +58,20 @@ export default function SearchScreen() {
   const hasQuery = query.trim().length > 0;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <ScreenHeader title="Cerca" />
-      <TextInput
-        style={styles.field}
-        placeholder="Cerca un Ruzza Watch…"
-        placeholderTextColor={Palette.whiteMuted}
-        value={query}
-        onChangeText={setQuery}
-        autoCapitalize="none"
-        autoCorrect={false}
-        returnKeyType="search"
+    <>
+      <Stack.Screen
+        options={{
+          headerTitle: 'Cerca',
+          headerSearchBarOptions: {
+            placeholder: 'Cerca un Ruzza Watch…',
+            onChangeText: (e) => setQuery(e.nativeEvent.text),
+            autoCapitalize: 'none',
+            hideWhenScrolling: false,
+            textColor: Palette.white,
+            headerIconColor: Palette.white,
+            tintColor: Palette.blue,
+          },
+        }}
       />
       <FlatList
         data={results}
@@ -72,8 +79,10 @@ export default function SearchScreen() {
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
+        contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         renderItem={({ item }) => (
           <View style={styles.cell}>
             <GridCard product={item} />
@@ -84,7 +93,7 @@ export default function SearchScreen() {
             <Text style={styles.empty}>
               {hasQuery
                 ? `Nessun risultato per “${query.trim()}”.`
-                : 'Inizia a scrivere per cercare.'}
+                : 'Cerca tra i Ruzza Watch.'}
             </Text>
           )
         }
@@ -94,26 +103,13 @@ export default function SearchScreen() {
           <ActivityIndicator size="large" color={Palette.white} />
         </View>
       )}
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'transparent' },
-  field: {
-    marginHorizontal: 16,
-    marginTop: 4,
-    marginBottom: 12,
-    height: 44,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    color: Palette.white,
-    fontSize: 16,
-    fontFamily: Font.sans,
-  },
   row: { gap: 16, paddingHorizontal: 16 },
-  content: { gap: 16, paddingTop: 4 },
+  content: { gap: 16, paddingTop: 12 },
   cell: { flex: 1, maxWidth: '50%' },
   empty: {
     color: Palette.whiteMuted,
@@ -121,7 +117,7 @@ const styles = StyleSheet.create({
     fontFamily: Font.sans,
     textAlign: 'center',
     paddingHorizontal: 16,
-    paddingTop: 40,
+    paddingTop: 48,
   },
   loadingOverlay: {
     position: 'absolute',

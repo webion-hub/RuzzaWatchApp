@@ -1,5 +1,6 @@
 import { Host } from '@expo/ui';
 import {
+  Button,
   HStack,
   Image as SUIImage,
   RNHostView,
@@ -8,7 +9,8 @@ import {
   Text,
   VStack,
 } from '@expo/ui/swift-ui';
-import { font, foregroundColor, frame, padding } from '@expo/ui/swift-ui/modifiers';
+import { buttonStyle, font, foregroundColor, frame, padding } from '@expo/ui/swift-ui/modifiers';
+import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -30,6 +32,7 @@ import type { Product } from '@/lib/types';
  */
 export default function WatchScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { width } = useWindowDimensions();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,8 +76,12 @@ export default function WatchScreen() {
                 Ruzza Watch
               </Text>
               <Spacer />
-              <Text modifiers={[foregroundColor(Palette.white), font({ size: 16 })]}>Vedili tutti</Text>
-              <SUIImage systemName="arrow.right" size={14} color={Palette.white} />
+              <Button onPress={() => router.navigate('/search')} modifiers={[buttonStyle('plain')]}>
+                <HStack spacing={4}>
+                  <Text modifiers={[foregroundColor(Palette.white), font({ size: 16 })]}>Vedili tutti</Text>
+                  <SUIImage systemName="arrow.right" size={14} color={Palette.white} />
+                </HStack>
+              </Button>
             </HStack>
 
             {empty ? (

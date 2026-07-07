@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -22,6 +23,7 @@ import type { Product } from '@/lib/types';
 
 export default function WatchScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -82,14 +84,14 @@ export default function WatchScreen() {
               <Text style={styles.sectionTitleSans}>
                 I nuovi <Text style={styles.sectionTitleSerif}>Ruzza Watch</Text>
               </Text>
-              <View style={styles.linkRow}>
+              <Pressable style={styles.linkRow} onPress={() => router.navigate('/search')}>
                 <Text style={styles.linkText}>Vedili tutti</Text>
                 <MaterialCommunityIcons
                   name="arrow-right"
                   size={16}
                   color={Palette.white}
                 />
-              </View>
+              </Pressable>
             </View>
 
             {/* Carousel */}
