@@ -77,7 +77,7 @@ export default function WatchScreen() {
     <View style={styles.container}>
       <Host style={styles.host}>
         <SUIScrollView>
-          <VStack alignment="leading" spacing={24} modifiers={[padding({ top: insets.top + 4, bottom: bottomPad })]}>
+          <VStack alignment="leading" spacing={24} modifiers={[padding({ top: 8, bottom: bottomPad })]}>
             {/* Watch header — scrolls with the page (no longer fixed) */}
             <HStack modifiers={[frame({ maxWidth: 9999 }), padding({ leading: 16, trailing: 16 })]}>
               <Text modifiers={[font({ family: 'GeneralSans-Semibold', size: 32 }), foregroundColor(Palette.white)]}>

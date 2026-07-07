@@ -109,12 +109,23 @@ export default function ProductDetailScreen() {
   // Header bar height, and the hero that fills exactly the viewport below it so
   // the price + button sit at the bottom of the first screen (description below).
   const headerHeight = insets.top + 50;
-  const heroHeight = height;
+  const heroHeight = height - headerHeight;
   const soldOut = !!product && !product.availableForSale;
   const price = product && priceParts(product.priceRange.minVariantPrice.amount);
 
   return (
     <View style={styles.container}>
+      {/* Header ABOVE the images — solid (blends with the dark top), no overlap */}
+      <View style={[styles.header, { paddingTop: insets.top + 4 }]}>
+        <View style={styles.backButton}>
+          <GlassSurface shape="circle" />
+          <Pressable onPress={() => router.back()} style={styles.backTap} accessibilityLabel="Indietro">
+            <MaterialCommunityIcons name="chevron-left" size={26} color={Palette.white} />
+          </Pressable>
+        </View>
+        <RNText style={styles.headerTitle}>Dettaglio prodotto</RNText>
+      </View>
+
       {loading || !product ? (
         <View style={[styles.center, { paddingTop: 120 }]}>
           {loading ? <ActivityIndicator size="large" color={Palette.white} /> : null}
@@ -123,7 +134,7 @@ export default function ProductDetailScreen() {
         <Host style={styles.host}>
           <SUIScrollView>
             <VStack alignment="leading" spacing={0} modifiers={[frame({ maxWidth: 9999, alignment: 'leading' })]}>
-              {/* HERO — fills the viewport: image (scrolls under the frosted header) on top,
+              {/* HERO — fills the viewport below the header: image + name on top,
                   price + button pinned to the bottom */}
               <VStack
                 alignment="leading"
@@ -141,7 +152,7 @@ export default function ProductDetailScreen() {
                 {/* Name directly under the images */}
                 <VStack
                   alignment="leading"
-                  spacing={28}
+                  spacing={40}
                   modifiers={[frame({ maxWidth: 9999, alignment: 'leading' }), padding({ top: 20 })]}>
                   <HStack modifiers={[frame({ maxWidth: 9999 }), padding({ leading: 16, trailing: 16 })]}>
                     <Text modifiers={[foregroundColor(Palette.white), font({ size: 12 })]}>
@@ -266,18 +277,6 @@ export default function ProductDetailScreen() {
           </SUIScrollView>
         </Host>
       )}
-
-      {/* Fixed header — transparent frosted glass; content scrolls under it (blurred) */}
-      <View style={[styles.header, { paddingTop: insets.top + 4, height: headerHeight }]}>
-        <GlassSurface shape="rectangle" />
-        <View style={styles.backButton}>
-          <GlassSurface shape="circle" />
-          <Pressable onPress={() => router.back()} style={styles.backTap} accessibilityLabel="Indietro">
-            <MaterialCommunityIcons name="chevron-left" size={26} color={Palette.white} />
-          </Pressable>
-        </View>
-        <RNText style={styles.headerTitle}>Dettaglio prodotto</RNText>
-      </View>
     </View>
   );
 }
@@ -292,12 +291,6 @@ const styles = StyleSheet.create({
   host: { flex: 1 },
   center: { flex: 1, alignItems: 'center' },
   header: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-    overflow: 'hidden',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
