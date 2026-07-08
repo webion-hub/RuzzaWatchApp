@@ -102,8 +102,9 @@ function RNTab({
 function CartTab() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { cart, loading, updateItem, removeItem, refresh } = useCart();
+  const { cart, loading, error, updateItem, removeItem, refresh } = useCart();
   const { isLoggedIn } = useAuth();
+  const [checkoutError, setCheckoutError] = useState(false);
   const lines = cart?.lines ?? [];
   const bottomPad = insets.bottom + FLOATING_FOOTER_HEIGHT + 24;
 
@@ -112,9 +113,17 @@ function CartTab() {
       router.push('/account');
       return;
     }
-    if (!cart?.checkoutUrl) return;
-    await WebBrowser.openBrowserAsync(cart.checkoutUrl);
-    await refresh();
+    if (!cart?.checkoutUrl) {
+      setCheckoutError(true);
+      return;
+    }
+    setCheckoutError(false);
+    try {
+      await WebBrowser.openBrowserAsync(cart.checkoutUrl);
+      await refresh();
+    } catch {
+      setCheckoutError(true);
+    }
   }, [isLoggedIn, cart?.checkoutUrl, router, refresh]);
 
   if (loading) {
@@ -192,6 +201,17 @@ function CartTab() {
                   </Text>
                 </HStack>
               </Button>
+
+              {error || checkoutError ? (
+                <Text
+                  modifiers={[
+                    foregroundColor(Palette.orange),
+                    font({ size: 13 }),
+                    frame({ maxWidth: 9999, alignment: 'center' }),
+                  ]}>
+                  Si è verificato un problema. Riprova.
+                </Text>
+              ) : null}
 
               {!isLoggedIn ? (
                 <Text

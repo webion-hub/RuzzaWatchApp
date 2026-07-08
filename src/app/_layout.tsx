@@ -1,9 +1,12 @@
 import {
   LibreBaskerville_400Regular,
   LibreBaskerville_400Regular_Italic,
+  LibreBaskerville_500Medium,
+  LibreBaskerville_500Medium_Italic,
 } from '@expo-google-fonts/libre-baskerville';
 import { useFonts } from 'expo-font';
-import { DarkTheme, Stack, ThemeProvider } from 'expo-router';
+import { DarkTheme, Stack, ThemeProvider, router } from 'expo-router';
+import type { ErrorBoundaryProps } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback } from 'react';
@@ -11,9 +14,31 @@ import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AppBackground } from '@/components/app-background';
+import { MessageScreen } from '@/components/message-screen';
 import { Palette } from '@/constants/design';
 import { AuthProvider } from '@/context/auth-context';
 import { CartProvider } from '@/context/cart-context';
+
+/**
+ * Global error boundary (expo-router picks up this named export). Catches any
+ * render error in the app and shows a branded recovery screen instead of a
+ * blank/crash, always offering a way back to the home tab.
+ */
+export function ErrorBoundary({ retry }: ErrorBoundaryProps) {
+  return (
+    <MessageScreen
+      title="Qualcosa è andato storto"
+      message="Si è verificato un problema imprevisto. Puoi riprovare o tornare alla home."
+      actionLabel="TORNA ALLA HOME"
+      onAction={() => {
+        retry();
+        router.replace('/');
+      }}
+      secondaryLabel="Riprova"
+      onSecondary={() => retry()}
+    />
+  );
+}
 
 SplashScreen.preventAutoHideAsync();
 
@@ -26,6 +51,8 @@ export default function RootLayout() {
     'GeneralSans-Semibold': require('@/assets/fonts/GeneralSans-Semibold.ttf'),
     LibreBaskerville_400Regular,
     LibreBaskerville_400Regular_Italic,
+    LibreBaskerville_500Medium,
+    LibreBaskerville_500Medium_Italic,
   });
 
   const onReady = useCallback(() => {

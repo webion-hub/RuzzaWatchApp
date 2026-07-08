@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   content: { paddingHorizontal: 24, paddingTop: 16, gap: 24 },
   title: { color: Palette.white, fontSize: 30, fontFamily: Font.sansMedium, paddingTop: 12 },
-  accent: { color: Palette.blue, fontFamily: Font.serifItalic, fontStyle: 'italic' },
+  accent: { color: Palette.blue, fontFamily: Font.serifItalic },
   form: { gap: 16 },
   error: {
     color: Palette.orange,

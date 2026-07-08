@@ -1,5 +1,6 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
+import { Platform } from 'react-native';
 
 import { Palette } from '@/constants/design';
 import { useCart } from '@/context/cart-context';
@@ -7,19 +8,24 @@ import { useCart } from '@/context/cart-context';
 /**
  * Native tab bar (`expo-router/unstable-native-tabs`) — a real UITabBar, so on
  * iOS 26 it renders with the system **Liquid Glass** material automatically (we
- * intentionally leave `backgroundColor` unset so the glass shows through). The
- * `role="search"` trigger becomes the separate glass search item on iOS 26.
+ * leave `backgroundColor` unset there so the glass shows through). Android has
+ * no Liquid Glass, so we give it an opaque dark bar instead of a translucent one.
  *
  * Icons reuse the app's MaterialCommunityIcons via `VectorIcon`; labels use the
  * General Sans family. Order: Carrello · Watch · Profumi · Search.
  */
 const { Icon, Label, Badge, VectorIcon } = NativeTabs.Trigger;
 
+// Opaque dark bar on Android; undefined on iOS to keep the Liquid Glass material.
+const androidBarColor = Platform.OS === 'android' ? '#262626' : undefined;
+
 export default function TabsLayout() {
   const { totalQuantity } = useCart();
 
   return (
     <NativeTabs
+      backgroundColor={androidBarColor}
+      indicatorColor={Palette.tabPill}
       badgeBackgroundColor={Palette.orange}
       iconColor={{ default: Palette.whiteMuted, selected: Palette.white }}
       labelStyle={{

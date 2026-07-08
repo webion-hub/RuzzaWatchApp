@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
 
   gate: { paddingTop: 40, gap: 16 },
   gateTitle: { color: Palette.white, fontSize: 32, fontFamily: Font.sansMedium },
-  gateAccent: { color: Palette.blue, fontFamily: Font.serifItalic, fontStyle: 'italic' },
+  gateAccent: { color: Palette.blue, fontFamily: Font.serifItalic },
   gateSub: { color: Palette.whiteMuted, fontSize: 16, lineHeight: 24, fontFamily: Font.sans },
   gateButtons: { gap: 12, marginTop: 16 },
   secondary: { paddingVertical: 16, alignItems: 'center' },

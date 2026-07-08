@@ -188,7 +188,6 @@ const styles = StyleSheet.create({
     color: Palette.blue,
     fontSize: 24,
     fontFamily: Font.serifItalic,
-    fontStyle: 'italic',
   },
   linkRow: {
     flexDirection: 'row',

@@ -69,6 +69,7 @@ export default function ProductDetailScreen() {
   const [related, setRelated] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState(false);
+  const [addError, setAddError] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -97,12 +98,13 @@ export default function ProductDetailScreen() {
     if (!product || !product.availableForSale) return;
     const variant = defaultVariant(product);
     if (!variant) return;
+    setAddError(false);
     try {
       await addItem(variant.id, 1);
       setAdded(true);
       setTimeout(() => setAdded(false), 1500);
     } catch {
-      // surfaced via cart context
+      setAddError(true);
     }
   }, [product, addItem]);
 
@@ -113,25 +115,51 @@ export default function ProductDetailScreen() {
   const soldOut = !!product && !product.availableForSale;
   const price = product && priceParts(product.priceRange.minVariantPrice.amount);
 
-  return (
-    <View style={styles.container}>
-      {/* Header ABOVE the images — solid (blends with the dark top), no overlap */}
-      <View style={[styles.header, { paddingTop: insets.top + 4 }]}>
-        <View style={styles.backButton}>
-          <GlassSurface shape="circle" />
-          <Pressable onPress={() => router.back()} style={styles.backTap} accessibilityLabel="Indietro">
-            <MaterialCommunityIcons name="chevron-left" size={26} color={Palette.white} />
+  // Header ABOVE the images — solid (blends with the dark top), no overlap.
+  const header = (
+    <View style={[styles.header, { paddingTop: insets.top + 4 }]}>
+      <View style={styles.backButton}>
+        <GlassSurface shape="circle" />
+        <Pressable onPress={() => router.back()} style={styles.backTap} accessibilityLabel="Indietro">
+          <MaterialCommunityIcons name="chevron-left" size={26} color={Palette.white} />
+        </Pressable>
+      </View>
+      <RNText style={styles.headerTitle}>Dettaglio prodotto</RNText>
+    </View>
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        {header}
+        <View style={[styles.center, { paddingTop: 120 }]}>
+          <ActivityIndicator size="large" color={Palette.white} />
+        </View>
+      </View>
+    );
+  }
+
+  if (!product) {
+    return (
+      <View style={styles.container}>
+        {header}
+        <View style={styles.notFound}>
+          <RNText style={styles.notFoundTitle}>Prodotto non trovato</RNText>
+          <RNText style={styles.notFoundText}>
+            Questo prodotto non è disponibile o è stato rimosso.
+          </RNText>
+          <Pressable style={styles.homeButton} onPress={() => router.replace('/')} accessibilityLabel="Torna alla home">
+            <RNText style={styles.homeButtonLabel}>TORNA ALLA HOME</RNText>
           </Pressable>
         </View>
-        <RNText style={styles.headerTitle}>Dettaglio prodotto</RNText>
       </View>
+    );
+  }
 
-      {loading || !product ? (
-        <View style={[styles.center, { paddingTop: 120 }]}>
-          {loading ? <ActivityIndicator size="large" color={Palette.white} /> : null}
-        </View>
-      ) : (
-        <Host style={styles.host}>
+  return (
+    <View style={styles.container}>
+      {header}
+      <Host style={styles.host}>
           <SUIScrollView>
             <VStack alignment="leading" spacing={0} modifiers={[frame({ maxWidth: 9999, alignment: 'leading' })]}>
               {/* HERO — fills the viewport below the header: image + name on top,
@@ -216,6 +244,19 @@ export default function ProductDetailScreen() {
                       {soldOut ? 'ESAURITO' : added ? 'AGGIUNTO ✓' : 'AGGIUNGI AL CARRELLO'}
                     </Text>
                   </Button>
+
+                  {addError ? (
+                    <Text
+                      modifiers={[
+                        foregroundColor(Palette.orange),
+                        font({ size: 13 }),
+                        multilineTextAlignment('center'),
+                        frame({ maxWidth: 9999, alignment: 'center' }),
+                        padding({ leading: 16, trailing: 16 }),
+                      ]}>
+                      Impossibile aggiungere al carrello. Riprova.
+                    </Text>
+                  ) : null}
                 </VStack>
               </VStack>
 
@@ -276,7 +317,6 @@ export default function ProductDetailScreen() {
             </VStack>
           </SUIScrollView>
         </Host>
-      )}
     </View>
   );
 }
@@ -290,6 +330,39 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   host: { flex: 1 },
   center: { flex: 1, alignItems: 'center' },
+  notFound: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+    gap: 12,
+  },
+  notFoundTitle: {
+    color: Palette.white,
+    fontFamily: Font.serif,
+    fontSize: 24,
+    textAlign: 'center',
+  },
+  notFoundText: {
+    color: Palette.whiteMuted,
+    fontFamily: Font.sans,
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  homeButton: {
+    backgroundColor: Palette.white,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 100,
+  },
+  homeButtonLabel: {
+    color: '#000000',
+    fontFamily: Font.sansSemibold,
+    fontSize: 14,
+    letterSpacing: 1.2,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

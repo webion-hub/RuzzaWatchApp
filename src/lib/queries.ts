@@ -7,8 +7,21 @@
  */
 
 import { WATCH_COLLECTION_ID } from '@/lib/config';
-import { shopifyFetch } from '@/lib/shopify';
+import { shopifyFetch, ShopifyError } from '@/lib/shopify';
 import type { Cart, Product } from '@/lib/types';
+
+/**
+ * Shopify's Cart API returns per-mutation `userErrors` (e.g. variant sold out,
+ * quantity not available, invalid line) in addition to network/GraphQL errors.
+ * Surface them as a ShopifyError so the UI can show Shopify's own validation.
+ */
+type CartUserError = { code: string | null; field: string[] | null; message: string };
+
+function assertNoCartUserErrors(userErrors: CartUserError[] | undefined) {
+  if (userErrors && userErrors.length > 0) {
+    throw new ShopifyError(userErrors.map((e) => e.message).join('; '));
+  }
+}
 
 /* ----------------------------------------------------------------------- */
 /* Fragments                                                               */
@@ -188,10 +201,18 @@ function flattenCart<T extends RawCart | null>(raw: T): Cart | null {
 }
 
 type CartResponse = { cart: RawCart | null };
-type CartCreateResponse = { cartCreate: { cart: RawCart | null } };
-type CartLinesAddResponse = { cartLinesAdd: { cart: RawCart | null } };
-type CartLinesUpdateResponse = { cartLinesUpdate: { cart: RawCart | null } };
-type CartLinesRemoveResponse = { cartLinesRemove: { cart: RawCart | null } };
+type CartCreateResponse = {
+  cartCreate: { cart: RawCart | null; userErrors: CartUserError[] };
+};
+type CartLinesAddResponse = {
+  cartLinesAdd: { cart: RawCart | null; userErrors: CartUserError[] };
+};
+type CartLinesUpdateResponse = {
+  cartLinesUpdate: { cart: RawCart | null; userErrors: CartUserError[] };
+};
+type CartLinesRemoveResponse = {
+  cartLinesRemove: { cart: RawCart | null; userErrors: CartUserError[] };
+};
 
 const CART_CREATE_MUTATION = /* GraphQL */ `
   ${CART_FRAGMENT}
@@ -199,6 +220,11 @@ const CART_CREATE_MUTATION = /* GraphQL */ `
     cartCreate(input: { lines: $lines, buyerIdentity: $buyerIdentity }) {
       cart {
         ...CartFields
+      }
+      userErrors {
+        code
+        field
+        message
       }
     }
   }
@@ -222,6 +248,11 @@ const CART_LINES_ADD_MUTATION = /* GraphQL */ `
       cart {
         ...CartFields
       }
+      userErrors {
+        code
+        field
+        message
+      }
     }
   }
 `;
@@ -233,6 +264,11 @@ const CART_LINES_UPDATE_MUTATION = /* GraphQL */ `
       cart {
         ...CartFields
       }
+      userErrors {
+        code
+        field
+        message
+      }
     }
   }
 `;
@@ -243,6 +279,11 @@ const CART_LINES_REMOVE_MUTATION = /* GraphQL */ `
     cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
       cart {
         ...CartFields
+      }
+      userErrors {
+        code
+        field
+        message
       }
     }
   }
@@ -269,6 +310,7 @@ export async function createCart(
     lines,
     buyerIdentity,
   });
+  assertNoCartUserErrors(data.cartCreate.userErrors);
   const cart = flattenCart(data.cartCreate.cart);
   if (!cart) throw new Error('Failed to create cart.');
   return cart;
@@ -305,6 +347,7 @@ export async function addCartLine(
     CART_LINES_ADD_MUTATION,
     { cartId, lines: [{ merchandiseId: variantId, quantity }] },
   );
+  assertNoCartUserErrors(data.cartLinesAdd.userErrors);
   const cart = flattenCart(data.cartLinesAdd.cart);
   if (!cart) throw new Error('Failed to add item to cart.');
   return cart;
@@ -319,6 +362,7 @@ export async function updateCartLine(
     CART_LINES_UPDATE_MUTATION,
     { cartId, lines: [{ id: lineId, quantity }] },
   );
+  assertNoCartUserErrors(data.cartLinesUpdate.userErrors);
   const cart = flattenCart(data.cartLinesUpdate.cart);
   if (!cart) throw new Error('Failed to update cart.');
   return cart;
@@ -332,6 +376,7 @@ export async function removeCartLine(
     CART_LINES_REMOVE_MUTATION,
     { cartId, lineIds: [lineId] },
   );
+  assertNoCartUserErrors(data.cartLinesRemove.userErrors);
   const cart = flattenCart(data.cartLinesRemove.cart);
   if (!cart) throw new Error('Failed to remove item.');
   return cart;

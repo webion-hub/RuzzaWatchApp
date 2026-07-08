@@ -97,11 +97,12 @@ function TabButton({
 /* ------------------------------- Cart tab -------------------------------- */
 
 function CartTab() {
-  const { cart, loading, updateItem, removeItem, refresh } = useCart();
+  const { cart, loading, error, updateItem, removeItem, refresh } = useCart();
   const { isLoggedIn } = useAuth();
   const router = useRouter();
   const bottomPad = useBottomPad();
   const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   const lines = cart?.lines ?? [];
@@ -118,13 +119,19 @@ function CartTab() {
       router.push('/account');
       return;
     }
-    if (!cart?.checkoutUrl) return;
+    if (!cart?.checkoutUrl) {
+      setCheckoutError(true);
+      return;
+    }
     setCheckingOut(true);
+    setCheckoutError(false);
     try {
       // Shopify's hosted checkout (handles payment, incl. Apple/Google Pay).
       await WebBrowser.openBrowserAsync(cart.checkoutUrl);
       // Returning from checkout: the order may have completed — sync the cart.
       await refresh();
+    } catch {
+      setCheckoutError(true);
     } finally {
       setCheckingOut(false);
     }
@@ -220,6 +227,12 @@ function CartTab() {
               </>
             )}
           </Pressable>
+
+          {error || checkoutError ? (
+            <Text style={styles.payError}>
+              Si è verificato un problema. Riprova.
+            </Text>
+          ) : null}
 
           {!isLoggedIn && (
             <Text style={styles.payHint}>
@@ -567,7 +580,6 @@ const styles = StyleSheet.create({
     color: Palette.blue,
     fontSize: 24,
     fontFamily: Font.serifItalic,
-    fontStyle: 'italic',
   },
   sectionSub: {
     color: Palette.whiteMuted,
@@ -735,6 +747,13 @@ const styles = StyleSheet.create({
   },
   payHint: {
     color: Palette.whiteMuted,
+    fontSize: 13,
+    fontFamily: Font.sans,
+    textAlign: 'center',
+    marginTop: 12,
+  },
+  payError: {
+    color: Palette.orange,
     fontSize: 13,
     fontFamily: Font.sans,
     textAlign: 'center',

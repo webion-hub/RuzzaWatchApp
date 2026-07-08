@@ -23,7 +23,11 @@ export const Font = {
   sans: 'GeneralSans-Regular',
   sansMedium: 'GeneralSans-Medium',
   sansSemibold: 'GeneralSans-Semibold',
-  serif: 'LibreBaskerville_400Regular',
+  /** Medium weight — big white headings / product names. */
+  serif: 'LibreBaskerville_500Medium',
+  /** Regular "Libre Baskerville" — the orange price and other upright serif. */
+  serifRegular: 'LibreBaskerville_400Regular',
+  /** Regular italic — the blue/orange accent words. */
   serifItalic: 'LibreBaskerville_400Regular_Italic',
 } as const;
 
