@@ -44,6 +44,14 @@ SplashScreen.preventAutoHideAsync();
 
 const transparent = { backgroundColor: 'transparent' } as const;
 
+// Transparent navigator background so the fixed <AppBackground/> (marble + dark
+// mask) shows through behind every screen. Without this, the navigator paints
+// DarkTheme's opaque background over it (the marble never showed on Android).
+const NavigationTheme = {
+  ...DarkTheme,
+  colors: { ...DarkTheme.colors, background: 'transparent' },
+};
+
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     'GeneralSans-Regular': require('@/assets/fonts/GeneralSans-Regular.ttf'),
@@ -63,7 +71,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={styles.root} onLayout={onReady}>
-      <ThemeProvider value={DarkTheme}>
+      <ThemeProvider value={NavigationTheme}>
         <AuthProvider>
           <CartProvider>
             <View style={styles.root}>

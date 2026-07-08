@@ -1,32 +1,26 @@
-import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { StyleSheet, View } from 'react-native';
-
-import { Palette } from '@/constants/design';
+import { ImageBackground, StyleSheet } from 'react-native';
 
 /**
- * Full-screen dark background with the marble texture overlay, matching the
- * Figma design (dark #1a1a1a→black gradient + faint marble). Rendered once
- * behind the tab content.
+ * Fixed full-screen background: the marble photo (`assets/images/marble-bg.png`)
+ * with a dark mask over it, so the marble veining stays visible but the app
+ * keeps its dark look (white text stays legible). Rendered once behind all
+ * content in the root layout — shared by iOS and Android.
  */
 export function AppBackground() {
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+    <ImageBackground
+      source={require('@/assets/images/marble-bg.png')}
+      resizeMode="cover"
+      style={[StyleSheet.absoluteFill, styles.noTouch]}>
       <LinearGradient
-        colors={[Palette.bgTop, Palette.bgBottom]}
+        colors={['rgba(0,0,0,0.72)', 'rgba(0,0,0,0.82)']}
         style={StyleSheet.absoluteFill}
       />
-      <Image
-        source={require('@/assets/images/marble-bg.png')}
-        style={[StyleSheet.absoluteFill, styles.marble]}
-        contentFit="cover"
-      />
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  marble: {
-    opacity: 0.16,
-  },
+  noTouch: { pointerEvents: 'none' },
 });
