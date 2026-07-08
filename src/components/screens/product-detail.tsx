@@ -85,11 +85,11 @@ export default function ProductDetailScreen() {
 
   const { height: windowHeight } = useWindowDimensions();
   const headerHeight = insets.top + 50;
-  // The first block (image + name + price + button) fills the viewport below the
-  // header, so the empty space falls AFTER the button and the description stays
-  // below the fold. The +24 mirrors the larger name→price gap (buyBlock marginTop
-  // 56→80) so the space AFTER the button (→ description) is left unchanged.
-  const heroHeight = windowHeight - headerHeight + 24;
+  // The first block (image + name + price + button) fills exactly the VISIBLE
+  // viewport below the header, so the description sits just below the fold with
+  // only a small gap above it (no large void). windowHeight includes the system
+  // nav bar (non-scrollable), so subtract insets.bottom to get the real height.
+  const heroHeight = windowHeight - headerHeight - insets.bottom;
 
   return (
     <View style={styles.container}>
