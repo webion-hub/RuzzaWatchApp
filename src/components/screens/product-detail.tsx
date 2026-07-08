@@ -87,8 +87,9 @@ export default function ProductDetailScreen() {
   const headerHeight = insets.top + 50;
   // The first block (image + name + price + button) fills the viewport below the
   // header, so the empty space falls AFTER the button and the description stays
-  // below the fold — while the name→price gap stays moderate.
-  const heroHeight = windowHeight - headerHeight;
+  // below the fold. The +24 mirrors the larger name→price gap (buyBlock marginTop
+  // 56→80) so the space AFTER the button (→ description) is left unchanged.
+  const heroHeight = windowHeight - headerHeight + 24;
 
   return (
     <View style={styles.container}>
@@ -317,11 +318,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.34,
     textAlign: 'center',
   },
-  // Buy block — price + add-to-cart, kept up near the name
+  // Buy block — price + add-to-cart. marginTop = name→price gap (see heroHeight).
   buyBlock: {
     paddingHorizontal: 16,
     gap: 20,
-    marginTop: 56,
+    marginTop: 80,
   },
   priceRow: {
     alignItems: 'center',
